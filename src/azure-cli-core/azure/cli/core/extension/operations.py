@@ -289,7 +289,7 @@ def show_extension(extension_name):
         raise CLIError(e)
 
 
-def update_extension(cmd=None, source=None, extension_name=None, index_url=None, pip_extra_index_urls=None, pip_proxy=None, cli_ctx=None):
+def update_extension(cmd=None, extension_name=None, index_url=None, pip_extra_index_urls=None, pip_proxy=None, cli_ctx=None, source=None):
     try:
         ext_sha256 = None
         cmd_cli_ctx = cli_ctx or cmd.cli_ctx

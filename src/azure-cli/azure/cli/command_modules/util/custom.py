@@ -73,7 +73,6 @@ def upgrade_version(cmd, _all=None):  # pylint: disable=too-many-locals, too-man
         elif installer == 'HOMEBREW':
             subprocess.call('brew update && brew upgrade -y azure-cli', shell=True)
         elif installer == 'PIP':
-            subprocess.call('pip install --upgrade azure-cli', shell=True)
             pip_args = ['install', '--upgrade', 'azure-cli']
             logger.debug('Executing pip with args: %s', pip_args)
             from azure.cli.core.extension._homebrew_patch import HomebrewPipPatch
