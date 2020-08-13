@@ -10,6 +10,8 @@ from msrestazure.tools import resource_id, is_valid_resource_id, parse_resource_
 from azure.cli.core.commands.client_factory import get_subscription_id
 from azure.cli.core.util import CLIError, sdk_no_wait
 from azure.mgmt.rdbms.mysql.operations._servers_operations import ServersOperations as MySqlServersOperations
+from azure.mgmt.rdbms.mysql.flexibleservers.operations._servers_operations import ServersOperations as MySqlFlexibleServersOperations
+from azure.mgmt.rdbms.postgresql.flexibleservers.operations._servers_operations import ServersOperations as PostgreSqlFlexibleServersOperations
 from azure.mgmt.rdbms.mariadb.operations._servers_operations import ServersOperations as MariaDBServersOperations
 from ._client_factory import get_mariadb_management_client, get_mysql_management_client, get_postgresql_management_client
 
@@ -21,54 +23,118 @@ def _server_create(cmd, client, resource_group_name, server_name, sku_name, no_w
                    geo_redundant_backup=None, ssl_enforcement=None, storage_mb=None, tags=None, version=None, auto_grow='Enabled',
                    assign_identity=False, public_network_access=None, infrastructure_encryption=None, minimal_tls_version=None):
     provider = 'Microsoft.DBforPostgreSQL'
+
     if isinstance(client, MySqlServersOperations):
+        provider = 'Microsoft.DBforMySQL'
+    elif isinstance(client, MySqlFlexibleServersOperations):
         provider = 'Microsoft.DBforMySQL'
     elif isinstance(client, MariaDBServersOperations):
         provider = 'Microsoft.DBforMariaDB'
 
     parameters = None
+
+    # until the create experience is setup use this:
+    flexservers = False
+    if tags.get("flexibleservers") != None and tags.get("flexibleservers") != "":
+        flexservers = tags.get("flexibleservers")
+        print("finding flexservers tag")
+        print(location)
+
     if provider == 'Microsoft.DBforMySQL':
         from azure.mgmt.rdbms import mysql
-        parameters = mysql.models.ServerForCreate(
-            sku=mysql.models.Sku(name=sku_name),
-            properties=mysql.models.ServerPropertiesForDefaultCreate(
+        if flexservers:
+            print("Reaching")
+            parameters = mysql.flexibleservers.models.Server(
+                sku=mysql.flexibleservers.models.Sku(name=sku_name,tier="GeneralPurpose"),
+                # properties=mysql.flexibleservers.models.TrackedResource(
+                #     administrator_login=administrator_login,
+                #     administrator_login_password=administrator_login_password,
+                #     version=version,
+                #     ssl_enforcement=ssl_enforcement,
+                #     minimal_tls_version=minimal_tls_version,
+                #     public_network_access=public_network_access,
+                #     infrastructure_encryption=infrastructure_encryption,
+                #     storage_profile=mysql.flexibleservers.models.StorageProfile(
+                #         backup_retention_days=backup_retention,
+                #         storage_mb=storage_mb,
+                #         storage_autogrow=auto_grow),
+                #     create_mode="Default",
+                #     location=location),
                 administrator_login=administrator_login,
                 administrator_login_password=administrator_login_password,
                 version=version,
                 ssl_enforcement=ssl_enforcement,
-                minimal_tls_version=minimal_tls_version,
                 public_network_access=public_network_access,
                 infrastructure_encryption=infrastructure_encryption,
-                storage_profile=mysql.models.StorageProfile(
+                storage_profile=mysql.flexibleservers.models.StorageProfile(
                     backup_retention_days=backup_retention,
-                    geo_redundant_backup=geo_redundant_backup,
                     storage_mb=storage_mb,
-                    storage_autogrow=auto_grow)),
-            location=location,
-            tags=tags)
-        if assign_identity:
-            parameters.identity = mysql.models.ResourceIdentity(type=mysql.models.IdentityType.system_assigned.value)
+                    storage_autogrow=auto_grow),
+                create_mode="Create",
+                location=location,
+                tags=tags)
+            print("After the server create flex statement")
+        else:
+            parameters = mysql.models.ServerForCreate(
+                sku=mysql.models.Sku(name=sku_name),
+                properties=mysql.models.ServerPropertiesForDefaultCreate(
+                    administrator_login=administrator_login,
+                    administrator_login_password=administrator_login_password,
+                    version=version,
+                    ssl_enforcement=ssl_enforcement,
+                    minimal_tls_version=minimal_tls_version,
+                    public_network_access=public_network_access,
+                    infrastructure_encryption=infrastructure_encryption,
+                    storage_profile=mysql.models.StorageProfile(
+                        backup_retention_days=backup_retention,
+                        geo_redundant_backup=geo_redundant_backup,
+                        storage_mb=storage_mb,
+                        storage_autogrow=auto_grow)),
+                location=location,
+                tags=tags)
+            if assign_identity:
+                parameters.identity = mysql.models.ResourceIdentity(type=mysql.models.IdentityType.system_assigned.value)
     elif provider == 'Microsoft.DBforPostgreSQL':
         from azure.mgmt.rdbms import postgresql
-        parameters = postgresql.models.ServerForCreate(
-            sku=postgresql.models.Sku(name=sku_name),
-            properties=postgresql.models.ServerPropertiesForDefaultCreate(
+
+        if flexservers:
+            print("Reaching postgres")
+            parameters = postgresql.flexibleservers.models.Server(
+                sku=postgresql.flexibleservers.models.Sku(name=sku_name, tier="GeneralPurpose", capacity=4),
                 administrator_login=administrator_login,
                 administrator_login_password=administrator_login_password,
                 version=version,
                 ssl_enforcement=ssl_enforcement,
-                minimal_tls_version=minimal_tls_version,
                 public_network_access=public_network_access,
                 infrastructure_encryption=infrastructure_encryption,
-                storage_profile=postgresql.models.StorageProfile(
+                storage_profile=postgresql.flexibleservers.models.StorageProfile(
                     backup_retention_days=backup_retention,
-                    geo_redundant_backup=geo_redundant_backup,
                     storage_mb=storage_mb,
-                    storage_autogrow=auto_grow)),
-            location=location,
-            tags=tags)
-        if assign_identity:
-            parameters.identity = postgresql.models.ResourceIdentity(type=postgresql.models.IdentityType.system_assigned.value)
+                    storage_autogrow=auto_grow),
+                create_mode="Default",
+                location=location,
+                tags=tags)
+            print("After the server create flex postgres statement")
+        else:
+            parameters = postgresql.models.ServerForCreate(
+                sku=postgresql.models.Sku(name=sku_name),
+                properties=postgresql.models.ServerPropertiesForDefaultCreate(
+                    administrator_login=administrator_login,
+                    administrator_login_password=administrator_login_password,
+                    version=version,
+                    ssl_enforcement=ssl_enforcement,
+                    minimal_tls_version=minimal_tls_version,
+                    public_network_access=public_network_access,
+                    infrastructure_encryption=infrastructure_encryption,
+                    storage_profile=postgresql.models.StorageProfile(
+                        backup_retention_days=backup_retention,
+                        geo_redundant_backup=geo_redundant_backup,
+                        storage_mb=storage_mb,
+                        storage_autogrow=auto_grow)),
+                location=location,
+                tags=tags)
+            if assign_identity:
+                parameters.identity = postgresql.models.ResourceIdentity(type=postgresql.models.IdentityType.system_assigned.value)
     elif provider == 'Microsoft.DBforMariaDB':
         from azure.mgmt.rdbms import mariadb
         parameters = mariadb.models.ServerForCreate(

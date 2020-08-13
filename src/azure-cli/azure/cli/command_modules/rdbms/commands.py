@@ -58,8 +58,17 @@ def load_command_table(self, _):
         client_factory=cf_mysql_servers
     )
 
+    mysql_servers_sdk2 = CliCommandType(
+        operations_tmpl='azure.mgmt.rdbms.mysql.flexibleservers.operations#ServersOperations.{}',
+        client_factory=cf_mysql_servers
+    )
     postgres_servers_sdk = CliCommandType(
         operations_tmpl='azure.mgmt.rdbms.postgresql.operations#ServersOperations.{}',
+        client_factory=cf_postgres_servers
+    )
+
+    postgres_servers_sdk2 = CliCommandType(
+        operations_tmpl='azure.mgmt.rdbms.postgresql.flexibleservers.operations#ServersOperations.{}',
         client_factory=cf_postgres_servers
     )
 
@@ -227,7 +236,7 @@ def load_command_table(self, _):
         g.custom_wait_command('wait', '_server_mariadb_get')
         g.command('restart', 'restart')
 
-    with self.command_group('mysql server', mysql_servers_sdk, client_factory=cf_mysql_servers) as g:
+    with self.command_group('mysql server', mysql_servers_sdk2, client_factory=cf_mysql_servers) as g:
         g.custom_command('create', '_server_create')
         g.custom_command('restore', '_server_restore', supports_no_wait=True)
         g.custom_command('georestore', '_server_georestore', supports_no_wait=True)
@@ -241,7 +250,7 @@ def load_command_table(self, _):
         g.custom_wait_command('wait', '_server_mysql_get')
         g.command('restart', 'restart')
 
-    with self.command_group('postgres server', postgres_servers_sdk, client_factory=cf_postgres_servers) as g:
+    with self.command_group('postgres server', postgres_servers_sdk2, client_factory=cf_postgres_servers) as g:
         g.custom_command('create', '_server_create')
         g.custom_command('restore', '_server_restore', supports_no_wait=True)
         g.custom_command('georestore', '_server_georestore', supports_no_wait=True)

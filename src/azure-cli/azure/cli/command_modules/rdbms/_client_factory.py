@@ -41,10 +41,11 @@ def get_mariadb_management_client(cli_ctx, **_):
     # Normal production scenario.
     return get_mgmt_service_client(cli_ctx, MariaDBManagementClient)
 
-
+## MOLJAIN TO DO: changed the import below to point specifically to flexibleservers, old APIs won't use this client though
+## so need to rework or introduce new client methods
 def get_mysql_management_client(cli_ctx, **_):
     from os import getenv
-    from azure.mgmt.rdbms.mysql import MySQLManagementClient
+    from azure.mgmt.rdbms.mysql.flexibleservers import MySQLManagementClient
 
     # Allow overriding resource manager URI using environment variable
     # for testing purposes. Subscription id is also determined by environment
@@ -69,10 +70,11 @@ def get_mysql_management_client(cli_ctx, **_):
     # Normal production scenario.
     return get_mgmt_service_client(cli_ctx, MySQLManagementClient)
 
-
+## MOLJAIN TO DO: changed the import below to point specifically to flexibleservers, old APIs won't use this client though
+## so need to rework or introduce new client methods
 def get_postgresql_management_client(cli_ctx, **_):
     from os import getenv
-    from azure.mgmt.rdbms.postgresql import PostgreSQLManagementClient
+    from azure.mgmt.rdbms.postgresql.flexibleservers import PostgreSQLManagementClient
 
     # Allow overriding resource manager URI using environment variable
     # for testing purposes. Subscription id is also determined by environment

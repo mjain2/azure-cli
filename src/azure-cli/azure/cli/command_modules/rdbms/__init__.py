@@ -32,6 +32,7 @@ class RdbmsCommandsLoader(AzCommandsLoader):
     def load_command_table(self, args):
         from azure.cli.command_modules.rdbms.commands import load_command_table
         load_command_table(self, args)
+        print("loading")
         return self.command_table
 
     def load_arguments(self, command):
