@@ -21,7 +21,7 @@ from azure.cli.command_modules.rdbms._client_factory import (
     cf_postgres_flexible_config,
     cf_postgres_flexible_location_capabilities)
 
-from ._transformers import table_transform_output, table_transform_output_list_servers
+from ._transformers import table_transform_output, table_transform_output_list_servers, table_transform_output_list_sku
 # from .transformers import table_transform_connection_string
 # from .validators import db_up_namespace_processor
 
@@ -95,7 +95,6 @@ def load_flexibleserver_command_table(self, _):
         g.command('start', 'start')
         g.command('stop', 'stop')
         g.custom_command('delete', '_server_delete_func')
-        #g.command('delete', 'delete', confirmation=True)
         g.show_command('show', 'get')
         g.custom_command('list', '_server_list_custom_func', custom_command_type=flexible_server_custom_common, table_transformer=table_transform_output_list_servers)
         g.generic_update_command('update',
@@ -111,7 +110,6 @@ def load_flexibleserver_command_table(self, _):
                             client_factory=cf_postgres_flexible_firewall_rules) as g:
         g.command('create', 'create_or_update')
         g.custom_command('delete', '_firewall_rule_delete_func', custom_command_type=flexible_server_custom_common)
-        # g.command('delete', 'delete', confirmation=True)
         g.show_command('show', 'get')
         g.command('list', 'list_by_server')
         # g.custom_command('list', '_flexible_firewall_get_test') # this is setup solely for debugging
@@ -132,8 +130,7 @@ def load_flexibleserver_command_table(self, _):
     with self.command_group('postgres flexible-server', postgres_flexible_location_capabilities_sdk,
                             custom_command_type=flexible_servers_custom_postgres,
                             client_factory=cf_postgres_flexible_location_capabilities) as g:
-       # g.command('list-skus', 'execute')
-        g.custom_command('list-skus', '_flexible_list_skus')
+        g.custom_command('list-skus', '_flexible_list_skus', table_transformer=table_transform_output_list_sku)
         g.custom_command('show-connection-string', 'flexible_server_connection_string')
 
 
@@ -146,7 +143,6 @@ def load_flexibleserver_command_table(self, _):
         g.command('start', 'start')
         g.command('stop', 'stop')
         g.custom_command('delete', '_server_delete_func')
-        #g.command('delete', 'delete', confirmation=True)
         g.show_command('show', 'get')
         g.custom_command('list', '_server_list_custom_func', custom_command_type=flexible_server_custom_common, table_transformer=table_transform_output_list_servers)
         g.generic_update_command('update',
@@ -182,14 +178,13 @@ def load_flexibleserver_command_table(self, _):
     with self.command_group('mysql flexible-server db', mysql_flexible_db_sdk) as g:
         g.command('create', 'create_or_update')
         g.custom_command('delete', '_database_delete_func', custom_command_type=flexible_server_custom_common)
-        # g.command('delete', 'delete', confirmation=True)
         g.show_command('show', 'get')
         g.command('list', 'list_by_server')
 
     with self.command_group('mysql flexible-server', mysql_flexible_location_capabilities_sdk,
                             custom_command_type=flexible_servers_custom_mysql,
                             client_factory=cf_mysql_flexible_location_capabilities) as g:
-        g.custom_command('list-skus', '_flexible_list_skus')
+        g.custom_command('list-skus', '_flexible_list_skus', table_transformer=table_transform_output_list_sku)
         g.custom_command('show-connection-string', 'flexible_server_connection_string')
 
     with self.command_group('mysql flexible-server replica', mysql_flexible_replica_sdk) as g:

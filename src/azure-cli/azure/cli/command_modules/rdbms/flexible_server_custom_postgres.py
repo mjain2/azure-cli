@@ -18,6 +18,8 @@ from ._flexible_server_util import generate_missing_parameters, resolve_poller, 
     parse_public_access_input, update_kwargs, generate_password, parse_maintenance_window
 from .flexible_server_virtual_network import create_vnet, prepareVnet
 
+from azure.cli.core._output import set_output_format
+
 logger = get_logger(__name__)
 DELEGATION_SERVICE_NAME = "Microsoft.DBforPostgreSQL/flexibleServers"
 
@@ -167,7 +169,6 @@ def _flexible_server_update_custom_func(instance,
 
     if sku_name:
         instance.sku.name = sku_name
-
     if tier:
         instance.sku.tier = tier
 
@@ -224,6 +225,8 @@ def _flexible_server_update_custom_func(instance,
 
 def _server_delete_func(cmd, client, resource_group_name=None, server_name=None, force=None):
     confirm = force
+    if not resource_group_name or not server_name:
+        raise CLIError('Resource group name and server name are required for flexible-server delete command')
     if not force:
         confirm = user_confirmation("Are you sure you want to delete the server '{0}' in resource group '{1}'".format(server_name, resource_group_name), yes=force)
     if (confirm):
@@ -261,8 +264,12 @@ def _flexible_parameter_update(client, server_name, configuration_name, resource
     return client.update(resource_group_name, server_name, configuration_name, value, source)
 
 
-def _flexible_list_skus(client, location):
-    return client.execute(location)
+def _flexible_list_skus(cmd, client, location, json=None):
+    if not json or json=='false':
+        set_output_format(cmd.cli_ctx, 'table')
+    result = client.execute(location)
+    logger.warning('For prices please refer to https://azure.microsoft.com/en-us/pricing/details/postgresql/server/')
+    return result
 
 
 def _create_server(db_context, cmd, resource_group_name, server_name, location, backup_retention, sku_name, tier,

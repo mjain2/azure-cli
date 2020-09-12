@@ -111,7 +111,7 @@ def _flexible_server_create(cmd, client, resource_group_name=None, server_name=N
                        ' reset your password with \'az mysql flexible-server update -n %s -g %s -p <new-password>\'.',
                        server_name, resource_group_name)
 
-        _update_local_contexts(cmd, server_name, resource_group_name, location, user)
+        _update_local_contexts(cmd, server_name, resource_group_name, location, user, database_name)
 
         return _form_response(user, sku, loc, id, host, version,
                               administrator_login_password if administrator_login_password is not None else '*****',
@@ -176,7 +176,6 @@ def _flexible_server_update_custom_func(instance,
 
     if sku_name:
         instance.sku.name = sku_name
-
     if tier:
         instance.sku.tier = tier
 
@@ -246,6 +245,8 @@ def _flexible_server_update_password(instance, server_name, administrator_login,
 
 def _server_delete_func(cmd, client, resource_group_name=None, server_name=None, force=None):
     confirm = force
+    if not resource_group_name or not server_name:
+        raise CLIError('Resource group name and server name are required for flexible-server delete command')
     if not force:
         confirm = user_confirmation("Are you sure you want to delete the server '{0}' in resource group '{1}'".format(server_name, resource_group_name), yes=force)
     if (confirm):
@@ -439,10 +440,12 @@ def _form_response(username, sku, location, id, host, version, password, connect
     return output
 
 
-def _update_local_contexts(cmd, server_name, resource_group_name, location, user):
+def _update_local_contexts(cmd, server_name, resource_group_name, location, user, database_name):
     if cmd.cli_ctx.local_context.is_on:
         cmd.cli_ctx.local_context.set(['mysql flexible-server'], 'server_name',
                                     server_name)  # Setting the server name in the local context
+        cmd.cli_ctx.local_context.set(['mysql flexible-server'], 'administrator_login', user) 
+        cmd.cli_ctx.local_context.set(['mysql flexible-server'], 'database_name', database_name) 
         cmd.cli_ctx.local_context.set([ALL], 'location',
                                     location)  # Setting the location in the local context
         cmd.cli_ctx.local_context.set([ALL], 'resource_group_name', resource_group_name)
