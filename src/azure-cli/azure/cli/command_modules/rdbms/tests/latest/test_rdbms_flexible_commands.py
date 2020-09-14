@@ -113,8 +113,7 @@ class FlexibleServerMgmtScenarioTest(ScenarioTest):
                 version, storage_size, backup_retention, tier,  high_availability, tags))
         
         # flexible-server show
-        result = self.cmd('{} flexible-server show -g {} -n {}'.format(database_engine, resource_group, server_name),
-                    checks=list_checks).get_output_in_json()
+        self.cmd('{} flexible-server show -g {} -n {}'.format(database_engine, resource_group, server_name), checks=list_checks)
 
         # flexible-server update
         # update storage profile
@@ -133,7 +132,7 @@ class FlexibleServerMgmtScenarioTest(ScenarioTest):
         maintenance_window_day = '1'
         maintenance_window_start_hour = '8'
         maintenance_window_start_minute = '30'
-        maintenance_window = maintenance_window_day + ':' + maintenance_window_start_hour + ':' + maintenance_window_start_minute
+        maintenance_window = 'Mon' + ':' + maintenance_window_start_hour + ':' + maintenance_window_start_minute
         updated_list_checks = [JMESPathCheck('maintenanceWindow.dayOfWeek', maintenance_window_day),
                                 JMESPathCheck('maintenanceWindow.startHour', maintenance_window_start_hour),
                                 JMESPathCheck('maintenanceWindow.startMinute', maintenance_window_start_minute)]
