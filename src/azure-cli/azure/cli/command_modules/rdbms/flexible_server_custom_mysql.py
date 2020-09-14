@@ -11,6 +11,7 @@ from knack.log import get_logger
 from azure.cli.core.commands.client_factory import get_subscription_id
 from azure.cli.core.util import CLIError, sdk_no_wait
 from azure.cli.core.local_context import ALL
+from azure.cli.core._output import set_output_format
 from ._client_factory import get_mysql_flexible_management_client, cf_mysql_flexible_firewall_rules, cf_mysql_flexible_db
 from ._flexible_server_util import resolve_poller, generate_missing_parameters, create_firewall_rule, \
     parse_public_access_input, update_kwargs, generate_password, parse_maintenance_window
@@ -341,6 +342,12 @@ def _flexible_server_mysql_get(cmd, resource_group_name, server_name):
 def _flexible_list_skus(client, location):
     return client.list(location)
 
+def _flexible_list_skus(cmd, client, location, json=None):
+    if not json or json.lower()=='false':
+        set_output_format(cmd.cli_ctx, 'table')
+    result = client.execute(location)
+    logger.warning('For prices please refer to https://aka.ms/mysql_pricing')
+    return result
 
 def _create_server(db_context, cmd, resource_group_name, server_name, location, backup_retention, sku_name, tier,
                    storage_mb, administrator_login, administrator_login_password, version, tags, delegated_subnet_arguments,

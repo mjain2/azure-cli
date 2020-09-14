@@ -11,6 +11,7 @@ from msrestazure.tools import resource_id, is_valid_resource_id, parse_resource_
 from knack.log import get_logger
 from azure.cli.core.commands.client_factory import get_subscription_id
 from azure.cli.core.local_context import ALL
+from azure.cli.core._output import set_output_format
 from azure.cli.core.util import CLIError, sdk_no_wait
 from ._client_factory import cf_postgres_flexible_firewall_rules, get_postgresql_flexible_management_client
 from .flexible_server_custom_common import user_confirmation, _server_list_custom_func
@@ -18,7 +19,7 @@ from ._flexible_server_util import generate_missing_parameters, resolve_poller, 
     parse_public_access_input, update_kwargs, generate_password, parse_maintenance_window
 from .flexible_server_virtual_network import create_vnet, prepareVnet
 
-from azure.cli.core._output import set_output_format
+
 
 logger = get_logger(__name__)
 DELEGATION_SERVICE_NAME = "Microsoft.DBforPostgreSQL/flexibleServers"
@@ -263,10 +264,10 @@ def _flexible_parameter_update(client, server_name, configuration_name, resource
 
 
 def _flexible_list_skus(cmd, client, location, json=None):
-    if not json or json=='false':
+    if not json or json.lower()=='false':
         set_output_format(cmd.cli_ctx, 'table')
     result = client.execute(location)
-    logger.warning('For prices please refer to https://azure.microsoft.com/en-us/pricing/details/postgresql/server/')
+    logger.warning('For prices please refer to https://aka.ms/pg_pricing')
     return result
 
 

@@ -4,7 +4,7 @@
 # --------------------------------------------------------------------------------------------
 
 from collections import OrderedDict
-
+from azure.cli.core.util import CLIError
 
 def table_transform_output(result):
     table_result = []
@@ -37,17 +37,21 @@ def table_transform_output_list_servers(result):
 
 def table_transform_output_list_sku(result):
     table_result = []
-    skus_tiers = result[0]["supportedFlexibleServerEditions"]
-    for skus in skus_tiers:
-        tier_name = skus["name"]
-        keys = skus["supportedServerVersions"][1]["supportedVcores"]
-        for key in keys:
-            new_entry = OrderedDict()
-            new_entry['SKU'] = key['name']
-            new_entry['Tier'] = tier_name
-            new_entry['vCore'] = key['vCores']
-            new_entry['Memory'] = str(int(key['supportedMemoryPerVcoreMb']) * int(key['vCores']) // 1024) + " GiB"
-            new_entry['Max Disk IOPS'] = key['supportedIOPS']        
-            table_result.append(new_entry)
+    if len(result) > 1:
+        skus_tiers = result[0]["supportedFlexibleServerEditions"]
+        for skus in skus_tiers:
+            tier_name = skus["name"]
+            try:
+                keys = skus["supportedServerVersions"][1]["supportedVcores"]
+                for key in keys:
+                    new_entry = OrderedDict()
+                    new_entry['SKU'] = key['name']
+                    new_entry['Tier'] = tier_name
+                    new_entry['vCore'] = key['vCores']
+                    new_entry['Memory'] = str(int(key['supportedMemoryPerVcoreMb']) * int(key['vCores']) // 1024) + " GiB"
+                    new_entry['Max Disk IOPS'] = key['supportedIOPS']        
+                    table_result.append(new_entry)
+            except:
+                raise CLIError("There is no sku pricing for this location.")
+            
     return table_result
-
