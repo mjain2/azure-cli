@@ -368,6 +368,8 @@ def flexible_server_connection_string(
             server_name='{server}', database_name='{database}', administrator_login='{login}',
             administrator_login_password='{password}'):
     host = '{}.mysql.database.azure.com'.format(server_name)
+    if database_name is None:
+        database_name = 'mysql'
     return {
         'connectionStrings': _create_mysql_connection_strings(host, administrator_login, administrator_login_password, database_name)
     }
@@ -394,7 +396,7 @@ def _create_mysql_connection_strings(host, user, password, database):
         'host': host,
         'user': user,
         'password': password if password is not None else '{password}',
-        'database': database
+        'database': database if database is not None else 'mysql'
     }
 
     for k, v in result.items():
