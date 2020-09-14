@@ -15,7 +15,7 @@ from azure.mgmt.rdbms.mysql.flexibleservers.operations._servers_operations impor
 from ._client_factory import get_mysql_flexible_management_client, cf_mysql_flexible_firewall_rules, cf_mysql_flexible_db
 from ._flexible_server_util import resolve_poller, generate_missing_parameters, create_firewall_rule, \
     parse_public_access_input, update_kwargs, generate_password, parse_maintenance_window
-from .flexible_server_custom_common import user_confirmation, _server_list_custom_func
+from .flexible_server_custom_common import user_confirmation, server_list_custom_func
 from .flexible_server_virtual_network import create_vnet, prepare_vnet
 
 logger = get_logger(__name__)
@@ -24,7 +24,7 @@ DELEGATION_SERVICE_NAME = "Microsoft.DBforMySQL/flexibleServers"
 
 
 # region create without args
-def _flexible_server_create(cmd, client, resource_group_name=None, server_name=None, sku_name=None, tier=None,
+def flexible_server_create(cmd, client, resource_group_name=None, server_name=None, sku_name=None, tier=None,
                                 location=None, storage_mb=None, administrator_login=None,
                                 administrator_login_password=None, version=None,
                                 backup_retention=None, tags=None, public_access=None, database_name=None,
@@ -66,7 +66,7 @@ def _flexible_server_create(cmd, client, resource_group_name=None, server_name=N
             delegated_subnet_arguments = None
 
         # Get list of servers in the current sub
-        server_list = _server_list_custom_func(client)
+        server_list = server_list_custom_func(client)
 
         # Ensure that the server name is not in the rg and in the subscription
         for key in server_list:
@@ -122,7 +122,7 @@ def _flexible_server_create(cmd, client, resource_group_name=None, server_name=N
         logger.error(ex)
 
 
-def _flexible_server_restore(cmd, client, resource_group_name, server_name, source_server, restore_point_in_time, location=None, no_wait=False):
+def flexible_server_restore(cmd, client, resource_group_name, server_name, source_server, restore_point_in_time, location=None, no_wait=False):
     provider = 'Microsoft.DBforMySQL'
 
     if not is_valid_resource_id(source_server):
@@ -154,7 +154,7 @@ def _flexible_server_restore(cmd, client, resource_group_name, server_name, sour
     return sdk_no_wait(no_wait, client.create, resource_group_name, server_name, parameters)
 
 
-def _flexible_server_update_custom_func(instance,
+def flexible_server_update_custom_func(instance,
                                sku_name=None,
                                tier=None,
                                storage_mb=None,
@@ -222,12 +222,12 @@ def _flexible_server_update_custom_func(instance,
     return params
 
 def _flexible_server_update_password(instance, server_name, administrator_login, administrator_login_password):
-    return _flexible_server_update_custom_func(instance,
+    return flexible_server_update_custom_func(instance,
                                                server_name=server_name,
                                                administrator_login=administrator_login,
                                                administrator_login_password=administrator_login_password)
 
-def _server_delete_func(cmd, client, resource_group_name=None, server_name=None, force=None):
+def server_delete_func(cmd, client, resource_group_name=None, server_name=None, force=None):
     confirm = force
     if not force:
         confirm = user_confirmation("Are you sure you want to delete the server '{0}' in resource group '{1}'".format(server_name, resource_group_name), yes=force)
@@ -243,7 +243,7 @@ def _server_delete_func(cmd, client, resource_group_name=None, server_name=None,
 
 
 ## Parameter update command
-def _flexible_parameter_update(client, server_name, configuration_name, resource_group_name, source=None, value=None):
+def flexible_parameter_update(client, server_name, configuration_name, resource_group_name, source=None, value=None):
     if source is None and value is None:
         # update the command with system default
         try:
@@ -260,7 +260,7 @@ def _flexible_parameter_update(client, server_name, configuration_name, resource
 ## Replica commands
 
 # Custom functions for server replica, will add PostgreSQL part after backend ready in future
-def _flexible_replica_create(cmd, client, resource_group_name, server_name, source_server, no_wait=False, location=None, sku_name=None, tier=None, **kwargs):
+def flexible_replica_create(cmd, client, resource_group_name, server_name, source_server, no_wait=False, location=None, sku_name=None, tier=None, **kwargs):
     provider = 'Microsoft.DBforMySQL'
 
     # set source server id
@@ -297,7 +297,7 @@ def _flexible_replica_create(cmd, client, resource_group_name, server_name, sour
     return sdk_no_wait(no_wait, client.create, resource_group_name, server_name, parameters)
 
 
-def _flexible_replica_stop(client, resource_group_name, server_name):
+def flexible_replica_stop(client, resource_group_name, server_name):
     try:
         server_object = client.get(resource_group_name, server_name)
     except Exception as e:
@@ -316,12 +316,12 @@ def _flexible_replica_stop(client, resource_group_name, server_name):
     return client.update(resource_group_name, server_name, params)
 
 
-def _flexible_server_mysql_get(cmd, resource_group_name, server_name):
+def flexible_server_mysql_get(cmd, resource_group_name, server_name):
     client = get_mysql_flexible_management_client(cmd.cli_ctx)
     return client.servers.get(resource_group_name, server_name)
 
 
-def _flexible_list_skus(client, location):
+def flexible_list_skus(client, location):
     return client.list(location)
 
 
