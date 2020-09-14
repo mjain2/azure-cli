@@ -303,17 +303,17 @@ def load_arguments(self, _):    # pylint: disable=too-many-statements
             c.ignore('assign_identity') 
             c.argument('tier', options_list=['--tier'], validator=tier_validator,
                        help='Compute tier of the server. Accepted values: Burstable, GeneralPurpose, Memory Optimized ')
-            c.argument('backup_retention',  type=int, options_list=['--backup-retention'], 
+            c.argument('backup_retention', type=int, options_list=['--backup-retention'], 
                         help='The number of days a backup is retained. Range of 7 to 35 days. Default is 7 days.', validator=retention_validator)
             c.argument('administrator_login_password', options_list=['--admin-password', '-p'],
                        help='The password of the administrator. Minimum 8 characters and maximum 128 characters. Password must contain characters from three of the following categories: English uppercase letters, English lowercase letters, numbers, and non-alphanumeric characters.',)
-            c.argument('ha_enabled', default='Disabled', options_list=['--high-availability'], arg_type=get_enum_type(['Enabled', 'Disabled']), 
+            c.argument('ha_enabled', options_list=['--high-availability'], arg_type=get_enum_type(['Enabled', 'Disabled']), 
                         help='Enable or disable high availability feature.  Default value is Disabled.')
             c.argument('maintenance_window', options_list=['--maintenance-window'], validator=maintenance_window_validator,
                        help='Period of time (UTC) designated for maintenance. Examples: "Sun:23:30" to schedule on Sunday, 11:30pm UTC. To set back to default pass in "Disabled".')
             c.argument('tags', tags_type)
             if command_group == 'mysql':
-                c.argument('sku_name', default='Standard_B1MS', options_list=['--sku-name'], validator=mysql_sku_name_validator,
+                c.argument('sku_name', options_list=['--sku-name'], validator=mysql_sku_name_validator,
                             help='The name of the compute SKU. Follows the convention Standard_{VM name}. Examples: Standard_B1ms, Standard_D4s_v3 ')
                 c.argument('storage_mb', options_list=['--storage-size'], type=int,
                            validator=mysql_storage_validator,
@@ -331,7 +331,7 @@ def load_arguments(self, _):    # pylint: disable=too-many-statements
                 c.argument('replication_role', options_list=['--replication-role'],
                            help='The replication role of the server.')
             elif command_group == 'postgres':
-                c.argument('sku_name', default='Standard_D2s_v3', options_list=['--sku-name'], validator=pg_sku_name_validator,
+                c.argument('sku_name', options_list=['--sku-name'], validator=pg_sku_name_validator,
                             help='The name of the compute SKU. Follows the convention Standard_{VM name}. Examples: Standard_D4s_v3 ')
                 c.argument('storage_mb', options_list=['--storage-size'], type=int,
                            validator=pg_storage_validator,
@@ -339,6 +339,7 @@ def load_arguments(self, _):    # pylint: disable=too-many-statements
 
         with self.argument_context('{} flexible-server list-skus'.format(command_group)) as c:
             c.argument('location', arg_type=get_location_type(self.cli_ctx))
+            c.argument('json', options_list=['--json'], help='Output in json format. true/false')
 
         # flexible-server parameter
         for scope in ['list', 'set', 'show']:
