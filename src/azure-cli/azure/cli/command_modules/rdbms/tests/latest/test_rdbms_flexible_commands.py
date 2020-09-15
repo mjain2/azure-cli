@@ -42,12 +42,10 @@ class FlexibleServerMgmtScenarioTest(ScenarioTest):
         if server_name:
             self.cmd('{} flexible-server delete -g {} -n {} --force'.format(database_engine, resource_group_name, server_name))
 
-
     @AllowLargeResponse()
     @ResourceGroupPreparer(location=location)
     def test_postgres_flexible_server_mgmt(self, resource_group):
         self._test_flexible_server_mgmt('postgres', resource_group)
-
 
     def _test_flexible_server_mgmt(self, database_engine, resource_group):
 
@@ -145,7 +143,6 @@ class FlexibleServerMgmtScenarioTest(ScenarioTest):
                  .format(database_engine, resource_group, server_name, sku_name),
                  checks=updated_list_checks)
 
-
         # flexible-server restart
         self.cmd('{} flexible-server restart -g {} -n {}'
                  .format(database_engine, resource_group, server_name), checks=NoneCheck())
@@ -205,7 +202,7 @@ class FlexibleServerLocalContextScenarioTest(LocalContextScenarioTest):
         list_checks = [JMESPathCheck('name', server_name),
                        JMESPathCheck('resourceGroup', resource_group),
                        JMESPathCheck('sku.name', sku_name),
-                       JMESPathCheck('storageProfile.storageMb', storage_size),
+                       JMESPathCheck('storageProfile.storageMb', storage_size_mb),
                        JMESPathCheck('administratorLogin', admin_user)]
 
         self.cmd('{} flexible-server create --name {} --admin-user {} --version {} --storage-size {} \
@@ -217,8 +214,9 @@ class FlexibleServerLocalContextScenarioTest(LocalContextScenarioTest):
         # flexible-server update
         backup_retention = 15
         storage_size = 256
+        storage_size_mb = storage_size * 1024
         updated_list_checks = [JMESPathCheck('storageProfile.backupRetentionDays', 15),
-                               JMESPathCheck('storageProfile.storageMb', storage_size)]
+                               JMESPathCheck('storageProfile.storageMb', storage_size_mb)]
 
         self.cmd('{} flexible-server update --backup-retention {} --storage-size {} '.format(database_engine,
                                                                                              backup_retention,
@@ -236,7 +234,6 @@ class FlexibleServerLocalContextScenarioTest(LocalContextScenarioTest):
         # flexible-server start
         self.cmd('{} flexible-server start'
                  .format(database_engine), checks=NoneCheck())
-
 
         # connections string
         context = self.cli_ctx.local_context
@@ -299,7 +296,7 @@ class FlexibleServerProxyResourceMgmtScenarioTest(ScenarioTest):
 
         # firewall-rule show
         self.cmd('{} flexible-server firewall-rule show -g {} -s {} --name {} '
-                 .format(database_engine, resource_group, server_name, firewall_rule_name, start_ip_address, end_ip_address),
+                 .format(database_engine, resource_group, server_name, firewall_rule_name),
                  checks=firewall_rule_checks)
 
         # firewall-rule update

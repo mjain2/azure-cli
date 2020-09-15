@@ -26,15 +26,15 @@ DELEGATION_SERVICE_NAME = "Microsoft.DBforPostgreSQL/flexibleServers"
 # region create without args
 # pylint: disable=too-many-locals
 def flexible_server_create(cmd, client,
-                            resource_group_name=None, server_name=None,
-                            location=None, backup_retention=None,
-                            sku_name=None, tier=None,
-                            storage_mb=None, administrator_login=None,
-                            administrator_login_password=None, version=None,
-                            tags=None, public_access=None,
-                            assign_identity=False, subnet_arm_resource_id=None,
-                            high_availability=None, zone=None, vnet_resource_id=None,
-                            vnet_address_prefix=None, subnet_address_prefix=None):
+                           resource_group_name=None, server_name=None,
+                           location=None, backup_retention=None,
+                           sku_name=None, tier=None,
+                           storage_mb=None, administrator_login=None,
+                           administrator_login_password=None, version=None,
+                           tags=None, public_access=None,
+                           assign_identity=False, subnet_arm_resource_id=None,
+                           high_availability=None, zone=None, vnet_resource_id=None,
+                           vnet_address_prefix=None, subnet_address_prefix=None):
     from azure.mgmt.rdbms import postgresql_flexibleservers
     try:
         db_context = DbContext(
@@ -129,9 +129,9 @@ def flexible_server_create(cmd, client,
 
 
 def flexible_server_restore(cmd, client,
-                             resource_group_name, server_name,
-                             source_server, restore_point_in_time,
-                             location=None, no_wait=False):
+                            resource_group_name, server_name,
+                            source_server, restore_point_in_time,
+                            location=None, no_wait=False):
     provider = 'Microsoft.DBforPostgreSQL'
     if not is_valid_resource_id(source_server):
         if len(source_server.split('/')) == 1:
@@ -163,15 +163,15 @@ def flexible_server_restore(cmd, client,
 
 # Update Flexible server command
 def flexible_server_update_custom_func(instance,
-                                sku_name=None,
-                                tier=None,
-                                storage_mb=None,
-                                backup_retention=None,
-                                administrator_login_password=None,
-                                ha_enabled=None,
-                                maintenance_window=None,
-                                assign_identity=False,
-                                tags=None):
+                                       sku_name=None,
+                                       tier=None,
+                                       storage_mb=None,
+                                       backup_retention=None,
+                                       administrator_login_password=None,
+                                       ha_enabled=None,
+                                       maintenance_window=None,
+                                       assign_identity=False,
+                                       tags=None):
     from importlib import import_module
     server_module_path = instance.__module__
     module = import_module(server_module_path)
@@ -275,7 +275,7 @@ def flexible_parameter_update(client, server_name, configuration_name, resource_
 
 
 def flexible_list_skus(cmd, client, location, json=None):
-    if not json or json.lower()=='false':
+    if not json or json.lower() == 'false':
         set_output_format(cmd.cli_ctx, 'table')
     result = client.execute(location)
     logger.warning('For prices please refer to https://aka.ms/postgres-pricing')
@@ -412,7 +412,7 @@ def _update_local_contexts(cmd, server_name, resource_group_name, location, user
         cmd.cli_ctx.local_context.set([ALL], 'resource_group_name', resource_group_name)
 
 
-# pylint: disable=too-many-instance-attributes,too-few-public-methods
+# pylint: disable=too-many-instance-attributes, too-few-public-methods, useless-object-inheritance
 class DbContext(object):
     def __init__(self, azure_sdk=None, logging_name=None, cf_firewall=None,
                  command_group=None, server_client=None):

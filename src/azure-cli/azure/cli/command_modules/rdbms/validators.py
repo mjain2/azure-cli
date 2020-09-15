@@ -228,7 +228,6 @@ def ip_address_validator(ns):
                        'Ip address should be IPv4 format. Example: 12.12.12.12. ')
 
 
-
 def public_access_validator(ns):
     if ns.public_access:
         val = ns.public_access.lower()

@@ -27,11 +27,11 @@ DELEGATION_SERVICE_NAME = "Microsoft.DBforMySQL/flexibleServers"
 # region create without args
 # pylint: disable=too-many-locals
 def flexible_server_create(cmd, client, resource_group_name=None, server_name=None, sku_name=None, tier=None,
-                                location=None, storage_mb=None, administrator_login=None,
-                                administrator_login_password=None, version=None,
-                                backup_retention=None, tags=None, public_access=None, database_name=None,
-                                subnet_arm_resource_id=None, high_availability=None, zone=None, assign_identity=False,
-                                vnet_resource_id=None, vnet_address_prefix=None, subnet_address_prefix=None):
+                           location=None, storage_mb=None, administrator_login=None,
+                           administrator_login_password=None, version=None,
+                           backup_retention=None, tags=None, public_access=None, database_name=None,
+                           subnet_arm_resource_id=None, high_availability=None, zone=None, assign_identity=False,
+                           vnet_resource_id=None, vnet_address_prefix=None, subnet_address_prefix=None):
     from azure.mgmt.rdbms import mysql_flexibleservers
     try:
         db_context = DbContext(
@@ -62,7 +62,7 @@ def flexible_server_create(cmd, client, resource_group_name=None, server_name=No
         # Handle Vnet scenario
         if (subnet_arm_resource_id is not None) or (vnet_resource_id is not None):
             subnet_id = prepare_vnet(cmd, server_name, vnet_resource_id, subnet_arm_resource_id, resource_group_name,
-                                    location, DELEGATION_SERVICE_NAME, vnet_address_prefix, subnet_address_prefix)
+                                     location, DELEGATION_SERVICE_NAME, vnet_address_prefix, subnet_address_prefix)
             delegated_subnet_arguments = mysql_flexibleservers.models.DelegatedSubnetArguments(
                 subnet_arm_resource_id=subnet_id)
         elif public_access is None and subnet_arm_resource_id is None and vnet_resource_id is None:
@@ -165,20 +165,20 @@ def flexible_server_restore(cmd, client, resource_group_name, server_name, sourc
 
 
 def flexible_server_update_custom_func(instance,
-                               sku_name=None,
-                               tier=None,
-                               storage_mb=None,
-                               backup_retention=None,
-                               administrator_login_password=None,
-                               ssl_enforcement=None,
-                               subnet_arm_resource_id=None,
-                               tags=None,
-                               auto_grow=None,
-                               assign_identity=False,
-                               public_network_access=None,
-                               ha_enabled=None,
-                               replication_role=None,
-                               maintenance_window=None):
+                                       sku_name=None,
+                                       tier=None,
+                                       storage_mb=None,
+                                       backup_retention=None,
+                                       administrator_login_password=None,
+                                       ssl_enforcement=None,
+                                       subnet_arm_resource_id=None,
+                                       tags=None,
+                                       auto_grow=None,
+                                       assign_identity=False,
+                                       public_network_access=None,
+                                       ha_enabled=None,
+                                       replication_role=None,
+                                       maintenance_window=None):
     from importlib import import_module
     server_module_path = instance.__module__
     module = import_module(server_module_path)  # replacement not needed for update in flex servers
@@ -354,6 +354,7 @@ def flexible_list_skus(cmd, client, location, json=None):
     logger.warning('For prices please refer to https://aka.ms/mysql-pricing')
     return result
 
+
 def _create_server(db_context, cmd, resource_group_name, server_name, location, backup_retention, sku_name, tier,
                    storage_mb, administrator_login, administrator_login_password, version, tags,
                    delegated_subnet_arguments,
@@ -488,7 +489,7 @@ def _create_mysql_connection_string(host, database_name, user_name, password):
     return 'server={host};database={dbname};uid={username};pwd={password}'.format(**connection_kwargs)
 
 
-# pylint: disable=too-many-instance-attributes,too-few-public-methods
+# pylint: disable=too-many-instance-attributes, too-few-public-methods, useless-object-inheritance
 class DbContext(object):
     def __init__(self, azure_sdk=None, logging_name=None, cf_firewall=None, cf_db=None,
                  command_group=None, server_client=None):
