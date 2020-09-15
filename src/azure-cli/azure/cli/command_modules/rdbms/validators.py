@@ -4,14 +4,13 @@
 # --------------------------------------------------------------------------------------------
 import re
 
+from knack.prompting import prompt_pass, NoTTYException
+from knack.util import CLIError
+from knack.log import get_logger
 from azure.cli.core.commands.client_factory import get_mgmt_service_client
 from azure.cli.core.commands.validators import (
     get_default_location_from_resource_group, validate_tags)
 from azure.cli.core.util import parse_proxy_resource_id
-
-from knack.prompting import prompt_pass, NoTTYException
-from knack.util import CLIError
-from knack.log import get_logger
 
 logger = get_logger(__name__)
 
