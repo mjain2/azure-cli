@@ -228,6 +228,7 @@ def ip_address_validator(ns):
                        'Ip address should be IPv4 format. Example: 12.12.12.12. ')
 
 
+
 def public_access_validator(ns):
     if ns.public_access:
         val = ns.public_access.lower()
@@ -241,7 +242,7 @@ def public_access_validator(ns):
 
 def _validate_ip(ips):
     """
-    # Regex not working for re.(regex, '255.255.255.255'). Hnece commenting it out for now
+    # Regex not working for re.(regex, '255.255.255.255'). Hence commenting it out for now
     regex = r'^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?).(
                 25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?).(
                 25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?).(

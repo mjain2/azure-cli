@@ -1,3 +1,7 @@
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
 import time
 
 from datetime import datetime, timedelta
@@ -21,7 +25,6 @@ from azure.cli.testsdk.preparers import (
     AbstractPreparer,
     SingleValueReplacer)
 
-
 # Constants
 SERVER_NAME_PREFIX = 'azuredbclitest-'
 SERVER_NAME_MAX_LENGTH = 20
@@ -30,21 +33,21 @@ GROUP_NAME_MAX_LENGTH = 20
 
 
 class FlexibleServerMgmtScenarioTest(ScenarioTest):
-
     location = 'eastus2euap'
 
     def _remove_resource_group(self, resource_group_name):
         self.cmd('group delete -n {} --yes'.format(resource_group_name))
-    
+
     def _remove_server(self, database_engine, resource_group_name, server_name):
         if server_name:
             self.cmd('{} flexible-server delete -g {} -n {} --force'.format(database_engine, resource_group_name, server_name))
-    
+
 
     @AllowLargeResponse()
     @ResourceGroupPreparer(location=location)
     def test_postgres_flexible_server_mgmt(self, resource_group):
         self._test_flexible_server_mgmt('postgres', resource_group)
+
 
     def _test_flexible_server_mgmt(self, database_engine, resource_group):
 
@@ -167,7 +170,6 @@ class FlexibleServerMgmtScenarioTest(ScenarioTest):
 
 
 class FlexibleServerLocalContextScenarioTest(LocalContextScenarioTest):
-
     location = 'eastus2euap'
 
     @AllowLargeResponse()
@@ -216,15 +218,17 @@ class FlexibleServerLocalContextScenarioTest(LocalContextScenarioTest):
         backup_retention = 15
         storage_size = 256
         updated_list_checks = [JMESPathCheck('storageProfile.backupRetentionDays', 15),
-                       JMESPathCheck('storageProfile.storageMb', storage_size)]
+                               JMESPathCheck('storageProfile.storageMb', storage_size)]
 
-        self.cmd('{} flexible-server update --backup-retention {} --storage-size {} '.format(database_engine, backup_retention, storage_size), \
-                    checks=updated_list_checks)
+        self.cmd('{} flexible-server update --backup-retention {} --storage-size {} '.format(database_engine,
+                                                                                             backup_retention,
+                                                                                             storage_size),
+                 checks=updated_list_checks)
 
         # restart
         self.cmd('{} flexible-server restart'
-                     .format(database_engine), checks=NoneCheck())
-        
+                 .format(database_engine), checks=NoneCheck())
+
         # flexible-server stop
         self.cmd('{} flexible-server stop'
                  .format(database_engine), checks=NoneCheck())
@@ -334,8 +338,7 @@ class FlexibleServerProxyResourceMgmtScenarioTest(ScenarioTest):
 
         self.cmd('{} flexible-server firewall-rule list -g {} -s {}'
                  .format(database_engine, resource_group, server_name), checks=NoneCheck())
-        
-    
+
     def _test_parameter_mgmt(self, database_engine, resource_group):
 
         server_name = self.create_random_name(SERVER_NAME_PREFIX, SERVER_NAME_MAX_LENGTH)
