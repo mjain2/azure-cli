@@ -389,6 +389,21 @@ def load_arguments(self, _):    # pylint: disable=too-many-statements
         with self.argument_context('{} flexible-server db delete'.format(command_group)) as c:
             c.argument('database_name', arg_type=database_name_getter_arg_type, options_list=['--database-name', '-d'], help='The name of a database.')
 
+        with self.argument_context('{} flexible-server replica list'.format(command_group)) as c:
+            c.argument('server_name', options_list=['--name', '-s'], help='Name of the server.')
+
+        with self.argument_context('{} flexible-server replica create'.format(command_group)) as c:
+            c.argument('source_server', options_list=['--source-server'],
+                       help='The name or resource ID of the source server to restore from.')
+            c.argument('tier', options_list=['--tier'], validator=tier_validator,
+                       help='Compute tier of the server. Accepted values: Burstable, GeneralPurpose, Memory Optimized ')
+            if command_group == 'mysql':
+                c.argument('sku_name', options_list=['--sku-name'], validator=mysql_sku_name_validator,
+                           help='The name of the compute SKU. Follows the convention Standard_{VM name}. Examples: Standard_B1ms, Standard_D4s_v3 ')
+
+        with self.argument_context('{} flexible-server replica stop-replication'.format(command_group)) as c:
+            c.argument('server_name', options_list=['--name', '-s'], help='Name of the server.')
+
         with self.argument_context('{} flexible-server show-connection-string'.format(command_group)) as c:
             c.argument('server_name', options_list=['--server-name', '-s'], arg_type=server_name_arg_type, help='Name of the server.')
             c.argument('administrator_login', arg_type=administrator_login_arg_type, options_list=['--admin-user', '-u'],

@@ -200,3 +200,5 @@ def load_flexibleserver_command_table(self, _):
                             is_preview=True) as g:
         g.custom_command('create', 'flexible_replica_create', supports_no_wait=True)
         g.custom_command('stop-replication', 'flexible_replica_stop', confirmation=True)
+        g.custom_wait_command('wait', 'flexible_server_mysql_get')
+
